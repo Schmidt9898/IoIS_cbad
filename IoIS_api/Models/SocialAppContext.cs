@@ -14,7 +14,6 @@ namespace SocialApp.API.WebAPI.Models
     /// </summary>
     public class SocialAppContext : DbContext
     {
-
         // Init context with the super classes options
         public SocialAppContext(DbContextOptions<SocialAppContext> options) : base(options)
         {

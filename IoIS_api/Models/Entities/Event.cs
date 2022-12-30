@@ -1,9 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AutoMapper.Configuration.Annotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace SocialApp.API.WebAPI.Models.Entities
 {
     public class Event
     {
+        public Event()
+        {
+            Users = new HashSet<User>();
+        }
+
         [Required]
         public virtual int Id { get; set; }
         [Required, MaxLength(50)]
@@ -15,6 +21,7 @@ namespace SocialApp.API.WebAPI.Models.Entities
         [MaxLength(50)]
         public virtual string Location { get; set; }
         public virtual string Description { get; set; }
+        
         public virtual User CreatedBy { get; set; }
         [Required]
         public virtual string CreatedById { get; set; }

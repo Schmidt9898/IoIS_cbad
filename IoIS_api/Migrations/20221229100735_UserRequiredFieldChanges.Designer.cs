@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialApp.API.WebAPI.Models;
 
@@ -11,9 +12,10 @@ using SocialApp.API.WebAPI.Models;
 namespace SocialApp.API.WebAPI.Migrations
 {
     [DbContext(typeof(SocialAppContext))]
-    partial class SocialAppContextModelSnapshot : ModelSnapshot
+    [Migration("20221229100735_UserRequiredFieldChanges")]
+    partial class UserRequiredFieldChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

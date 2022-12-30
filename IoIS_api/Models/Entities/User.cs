@@ -9,13 +9,20 @@ namespace SocialApp.API.WebAPI.Models.Entities
     /// </summary>
     public class User : IdentityUser
     {
+        public User()
+        {
+            CreatedEvents = new HashSet<Event>();
+            CreatedPosts = new HashSet<Post>();
+            CreatedGroups = new HashSet<Group>();
+            EventsParticipating = new HashSet<Event>();
+        }
+
         [Required]
         public string FirstName { get; set; }
         [Required]
         public string LastName { get; set; }
-        public string ProfilePicturePath { get; set; }
-        [Required]
-        public string AboutMe { get; set; }
+        public string? ProfilePicturePath { get; set; }
+        public string? AboutMe { get; set; }
         public virtual ICollection<Event> CreatedEvents { get; set; }
         public virtual ICollection<Post> CreatedPosts { get; set; }
         public virtual ICollection<Event> EventsParticipating { get; set; }

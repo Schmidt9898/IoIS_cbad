@@ -2,6 +2,7 @@
 {
     public enum FriendState
     {
+        New,
         Pending,
         Accepted,
         Declined,
