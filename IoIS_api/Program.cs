@@ -100,6 +100,7 @@ builder.Services.AddSwaggerGen(option =>
 
 builder.Services.AddTransient<IEventService, EventService>();
 builder.Services.AddTransient<IFriendService, FriendService>();
+builder.Services.AddTransient<IPostService, PostService>();
 builder.Services.AddScoped<UserManager<User>>();
 
 // If you add a service that defines the logic then it should be injected here

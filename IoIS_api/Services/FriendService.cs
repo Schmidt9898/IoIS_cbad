@@ -5,6 +5,7 @@ using SocialApp.API.WebAPI.Models.Entities;
 using SocialApp.API.WebAPI.Services.Interfaces;
 using SocialApp.API.WebAPI.ViewModels;
 using SocialApp.Common;
+using System.Linq.Expressions;
 
 namespace SocialApp.API.WebAPI.Services
 {
@@ -40,7 +41,7 @@ namespace SocialApp.API.WebAPI.Services
                 Requester = user,
                 Addressee = friend,
                 CreatedAt = DateTime.Now,
-                State = FriendState.New
+                State = FriendState.Pending
             };
 
             _context.Friends.Add(friendship);
@@ -48,7 +49,7 @@ namespace SocialApp.API.WebAPI.Services
             return RequestState.Successful;
         }
 
-        public async Task<ICollection<UserVM>> GetAllFriendsAsync(User user)
+        public async Task<ICollection<UserVM>> GetAllFriendsWhereAsync(User user, Expression<Func<Friend, bool>> predicate)
         {
             // Get friends where the addressee or the requester is the user and the state is accepted
             // -> it does not matter who requested the friendship as long as it is accepted
@@ -56,20 +57,45 @@ namespace SocialApp.API.WebAPI.Services
             // btw ha erre van jobb ötleted, hogyan kéne azt szívesen fogadom...
             var friendsWhereUserIsRequester = await _context.Friends
                 .Include(f => f.Addressee)
-                .Where(f => f.RequesterId == user.Id && f.State == FriendState.Accepted)
+                .Where(predicate)
+                .Where(f => f.RequesterId == user.Id)
                 .Select(f => f.Addressee)
                 .Select(f => _mapper.Map<UserVM>(f))
                 .ToListAsync();
 
             var friendsWhereUserIsAddressee = await _context.Friends
                 .Include(f => f.Requester)
-                .Where(f => f.AddresseeId == user.Id && f.State == FriendState.Accepted)
+                .Where(predicate)
+                .Where(f => f.AddresseeId == user.Id)
                 .Select(f => f.Requester)
                 .Select(f => _mapper.Map<UserVM>(f))
                 .ToListAsync();
 
             var concat = friendsWhereUserIsAddressee.Concat(friendsWhereUserIsRequester);
             return concat.ToList();
+        }
+
+        public async Task<RequestState> UpdateFriendshipAsync(User user, string username, FriendState action)
+        {
+            // Cannot set state to pending
+            if (action == FriendState.Pending)
+                return RequestState.Error;
+
+            // Get only pending requests
+            var friendship = await _context.Friends
+                .Where(f => f.Requester.UserName == username && f.Addressee == user && f.State == FriendState.Pending)
+                .FirstOrDefaultAsync();
+
+            if (friendship is null)
+                return RequestState.NotFound;
+
+            friendship.State = action;
+            friendship.ModifiedAt = DateTime.Now;
+
+            _context.Entry(friendship).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+            return RequestState.Successful;
         }
     }
 }

@@ -13,6 +13,10 @@ namespace SocialApp.API.WebAPI.Profiles
             CreateMap<NewEventDto, Event>();
             CreateMap<UpdateEventDto, Event>();
             CreateMap<Event, EventVM>();
+            CreateMap<Post, PostVM>()
+                .ForMember(dst => dst.GroupName,
+                           opt => opt.MapFrom(src => src.Group.Name));
+            CreateMap<NewPostDto, Post>();
 
             CreateMap<User, UserVM>()
                 .ForMember(dst => dst.FullName,

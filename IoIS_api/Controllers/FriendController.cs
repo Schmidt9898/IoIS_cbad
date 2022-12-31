@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SocialApp.API.WebAPI.Dtos;
 using SocialApp.API.WebAPI.Models.Entities;
 using SocialApp.API.WebAPI.Services.Interfaces;
 using SocialApp.API.WebAPI.ViewModels;
@@ -9,7 +11,7 @@ using SocialApp.Common;
 
 namespace SocialApp.API.WebAPI.Controllers
 {
-    [Route("api/friends")]
+    [Route("api")]
     [ApiController]
     public class FriendController : ControllerBase
     {
@@ -25,16 +27,27 @@ namespace SocialApp.API.WebAPI.Controllers
         }
 
         // GET: api/<FriendController>
-        [HttpGet]
+        [HttpGet("friends")]
+        [Authorize]
         public async Task<IEnumerable<UserVM>> GetAllFriendsOfUser()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
 
-            return await _friendService.GetAllFriendsAsync(user);
+            return await _friendService.GetAllFriendsWhereAsync(user, f => f.State == FriendState.Accepted);
+        }
+
+        [HttpGet("friend-requests")]
+        [Authorize]
+        public async Task<IEnumerable<UserVM>> GetAllFriendRequests()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+
+            return await _friendService.GetAllFriendsWhereAsync(user, f => f.State == FriendState.Pending);
         }
 
         // GET api/<FriendController>/5
-        [HttpPost("{username}")]
+        [HttpPost("friends/{username}")]
+        [Authorize]
         public async Task<IActionResult> RequestFriendship(string username)
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
@@ -53,22 +66,25 @@ namespace SocialApp.API.WebAPI.Controllers
                 new { Status = "OK", Message = "Friend request sent." });
         }
 
-        // POST api/<FriendController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        // Accept or decline or delete request
+        [HttpPut("friends")]
+        [Authorize]
+        public async Task<IActionResult> Put([FromBody] UpdateFriendDto dto)
         {
-        }
+            var user = await _userManager.GetUserAsync(HttpContext.User);
 
-        // PUT api/<FriendController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+            var result = await _friendService.UpdateFriendshipAsync(user, dto.UserName, dto.Action);
 
-        // DELETE api/<FriendController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            if (result == RequestState.Error)
+                return StatusCode(StatusCodes.Status400BadRequest,
+                    new { State = "Bad request", Message = "Cannot set friendship status to pending." });
+
+            if (result == RequestState.NotFound)
+                return StatusCode(StatusCodes.Status404NotFound,
+                    new { State = "Not found", Message = "Friendship does not exist." });
+
+            return StatusCode(StatusCodes.Status200OK,
+                new { State = "OK", Message = "Friendship updated." });
         }
     }
 }

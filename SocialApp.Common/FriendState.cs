@@ -1,11 +1,12 @@
-﻿namespace SocialApp.Common
+﻿using System.Text.Json.Serialization;
+
+namespace SocialApp.Common
 {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum FriendState
     {
-        New,
         Pending,
         Accepted,
         Declined,
-        Deleted
     }
 }
