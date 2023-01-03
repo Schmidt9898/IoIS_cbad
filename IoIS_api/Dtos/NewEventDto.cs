@@ -8,8 +8,9 @@ namespace SocialApp.API.WebAPI.Dtos
         public string Name { get; set; }
         [Required, DataType(DataType.DateTime)]
         public DateTime EventTime { get; set; }
-        [MaxLength(50)]
+        [Required, MaxLength(50)]
         public string Location { get; set; }
+        [Required]
         public string? Description { get; set; }
     }
 }

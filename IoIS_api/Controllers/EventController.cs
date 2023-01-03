@@ -12,8 +12,8 @@ using ILogger = Serilog.ILogger;
 
 namespace SocialApp.API.WebAPI.Controllers
 {
-    [Route("api/events")]
     [ApiController]
+    [Route("/events")]
     public class EventController : ControllerBase
     {
         private readonly IEventService _eventService;

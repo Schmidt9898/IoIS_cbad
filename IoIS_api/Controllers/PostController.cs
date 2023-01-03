@@ -11,8 +11,8 @@ using SocialApp.API.WebAPI.ViewModels;
 
 namespace SocialApp.API.WebAPI.Controllers
 {
-    [Route("api")]
     [ApiController]
+    [Route("/")]
     public class PostController : ControllerBase
     {
         private readonly IPostService _postService;

@@ -22,6 +22,9 @@ namespace SocialApp.API.WebAPI.Services
 
         public async Task<RequestState> AddFriendAsync(User user, string username)
         {
+            if (username == user.UserName)
+                return RequestState.Error;
+
             var friend = await _context.Users
                 .Where(u => u.UserName == username)
                 .FirstOrDefaultAsync();

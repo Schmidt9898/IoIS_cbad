@@ -11,8 +11,8 @@ using SocialApp.Common;
 
 namespace SocialApp.API.WebAPI.Controllers
 {
-    [Route("api")]
     [ApiController]
+    [Route("/")]
     public class FriendController : ControllerBase
     {
         private readonly IFriendService _friendService;
@@ -46,13 +46,17 @@ namespace SocialApp.API.WebAPI.Controllers
         }
 
         // GET api/<FriendController>/5
-        [HttpPost("friends/{username}")]
+        [HttpPost("friends/add/{username}")]
         [Authorize]
         public async Task<IActionResult> RequestFriendship(string username)
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
 
             var result = await _friendService.AddFriendAsync(user, username);
+
+            if (result == RequestState.Error)
+                return StatusCode(StatusCodes.Status400BadRequest,
+                    new { Status = "Bad request", Message = $"Parameter username must be different than requesting user ({user.UserName})" });
 
             if (result == RequestState.NotFound)
                 return StatusCode(StatusCodes.Status404NotFound,

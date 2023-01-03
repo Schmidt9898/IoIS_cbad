@@ -13,8 +13,8 @@ using AutoMapper;
 
 namespace SocialApp.API.WebAPI.Controllers
 {
-    [Route("api/account")]
     [ApiController]
+    [Route("/account")]
     public class AuthenticationController : ControllerBase
     {
         private readonly UserManager<User> _userManager;

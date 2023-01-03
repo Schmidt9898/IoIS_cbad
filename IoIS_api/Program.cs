@@ -29,8 +29,16 @@ builder.Services.AddControllers();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Add DB context
-builder.Services.AddDbContext<SocialAppContext>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("SocialAppContext")));
+if (Environment.GetEnvironmentVariable("ASPNETCORE_EVIRONMENT") == "Production")
+{
+    builder.Services.AddDbContext<SocialAppContext>(opt =>
+        opt.UseSqlServer(builder.Configuration.GetConnectionString("SocialAppContextProd")));
+}
+else
+{
+    builder.Services.AddDbContext<SocialAppContext>(opt =>
+        opt.UseSqlServer(builder.Configuration.GetConnectionString("SocialAppContext")));
+}
 
 // Add automapper to map our entities to Dtos/ViewModels
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -72,7 +80,7 @@ builder.Services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
 {
-    option.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
+    option.SwaggerDoc("v1", new OpenApiInfo { Title = "Social Media Web API", Version = "v1" });
     option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -108,10 +116,10 @@ builder.Services.AddTransient<IEventService, EventService>();
 
 var app = builder.Build();
 
+app.UseSwagger();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
     app.UseSwaggerUI();
 }
 
