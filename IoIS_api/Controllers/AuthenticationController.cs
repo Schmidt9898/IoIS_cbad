@@ -70,7 +70,7 @@ namespace SocialApp.API.WebAPI.Controllers
             if (existingUser != null)
             {
                 _logger.LogError($"User creation failed. There is an existing user with username {registerDto.UserName}");
-                return StatusCode(StatusCodes.Status500InternalServerError,
+                return StatusCode(StatusCodes.Status400BadRequest,
                     new { Status = "Error", Message = "User creation failed. There is a user registered with this email or username." });
             }
 
@@ -88,8 +88,8 @@ namespace SocialApp.API.WebAPI.Controllers
             if (!creationResult.Succeeded)
             {
                 _logger.LogError($"User creation failed. Message: {creationResult.Errors.FirstOrDefault()}");
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new { Status = "Error", Message = "Error during user creation.", InnerException = $"{creationResult.Errors.FirstOrDefault()}" });
+                return StatusCode(StatusCodes.Status400BadRequest,
+                    new { Status = "Error", Message = "User creation failed. Invalid credential format.", InnerException = $"{creationResult.Errors.FirstOrDefault()}" });
             }
 
             _logger.LogInformation("User successfully created.");
