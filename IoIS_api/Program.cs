@@ -116,6 +116,9 @@ builder.Services.AddTransient<IEventService, EventService>();
 
 var app = builder.Build();
 
+// Seed database
+app.SeedUsers();
+
 app.UseSwagger();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
